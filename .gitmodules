@@ -1,0 +1,6 @@
+[submodule "tinycc"]
+	path = tinycc
+	url = https://github.com/davidar/tinycc.git
+[submodule "musl"]
+	path = musl
+	url = https://github.com/davidar/musl.git
