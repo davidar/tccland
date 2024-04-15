@@ -4,3 +4,6 @@
 [submodule "musl"]
 	path = musl
 	url = https://github.com/davidar/musl.git
+[submodule "toybox"]
+	path = toybox
+	url = https://github.com/davidar/toybox.git
