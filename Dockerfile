@@ -1,5 +1,5 @@
 FROM ubuntu:22.04 AS build
-RUN apt-get update && apt-get install -y build-essential file
+RUN apt-get update && apt-get install -y build-essential file automake
 
 COPY tinycc /src/tcc
 WORKDIR /src/tcc
@@ -34,8 +34,19 @@ RUN make -j$(nproc) CC=tcc \
     LDFLAGS="-nostdlib /usr/local/musl/lib/crt1.o /libc.ld -static"
 RUN PREFIX=/dest/usr/local make install
 
+COPY dash /src/dash
+WORKDIR /src/dash
+RUN ./autogen.sh
+RUN ./configure CC=tcc \
+    CFLAGS="-nostdinc -I/usr/local/musl/include" \
+    LDFLAGS="-nostdlib -static" \
+    LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
+RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
+RUN make -j$(nproc)
+RUN make DESTDIR=/dest install
+
 FROM scratch
 COPY --from=build /dest/usr /usr
 COPY libc.ld /usr/lib/libc.so
 COPY hello.c /usr/bin/hello
-CMD ["/usr/local/bin/toybox"]
+CMD ["/usr/local/bin/dash"]

@@ -7,3 +7,6 @@
 [submodule "toybox"]
 	path = toybox
 	url = https://github.com/davidar/toybox.git
+[submodule "dash"]
+	path = dash
+	url = https://git.kernel.org/pub/scm/utils/dash/dash.git
