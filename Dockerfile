@@ -1,5 +1,5 @@
 FROM ubuntu:22.04 AS build
-RUN apt-get update && apt-get install -y build-essential file automake
+RUN apt-get update && apt-get install -y build-essential file automake gdb
 
 COPY tinycc /src/tcc
 WORKDIR /src/tcc
@@ -29,8 +29,8 @@ RUN make DESTDIR=/dest install
 COPY toybox /src/toybox
 WORKDIR /src/toybox
 RUN make defconfig
-RUN make -j$(nproc) CC=tcc \
-    CFLAGS="-nostdinc -nostdlib -I/usr/local/musl/include -I/usr/include -I/usr/include/x86_64-linux-gnu" \
+RUN make -j$(nproc) NOSTRIP=1 CC=tcc \
+    CFLAGS="-nostdinc -nostdlib -I/usr/local/musl/include -I/usr/include -I/usr/include/x86_64-linux-gnu -g" \
     LDFLAGS="-nostdlib /usr/local/musl/lib/crt1.o /libc.ld -static"
 RUN PREFIX=/dest/usr/local make install
 
@@ -49,4 +49,4 @@ FROM scratch
 COPY --from=build /dest/usr /usr
 COPY libc.ld /usr/lib/libc.so
 COPY hello.c /usr/bin/hello
-CMD ["/usr/local/bin/dash"]
+CMD ["/usr/local/bin/ls"]

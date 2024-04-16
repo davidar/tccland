@@ -1,3 +1,5 @@
+all: build run
+
 build:
 	docker build . -t tccland --progress=plain
 
