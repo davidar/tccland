@@ -51,6 +51,14 @@ RUN make -j$(nproc)
 RUN make DESTDIR=/dest install
 RUN make clean
 
+COPY bmake /src/bmake
+RUN CC=tcc \
+    CFLAGS="-nostdinc -I/usr/local/musl/include" \
+    LDFLAGS="-nostdlib -static" \
+    LIBS="/usr/local/musl/lib/crt1.o /libc.ld" \
+    BROKEN_TESTS="directive-export directive-export-gmake varname-dot-make-jobs" \
+    /src/bmake/boot-strap --prefix=/usr/local --install-destdir=/dest --install
+
 FROM scratch
 COPY --from=build /dest/usr /usr
 COPY --from=build /src /src
