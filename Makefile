@@ -8,6 +8,9 @@ build:
 run:
 	docker run --name tccland --rm -it tccland
 
+hello:
+	docker run --rm tccland /usr/bin/hello
+
 debug:
 	docker run -it \
 		--pid=container:tccland \

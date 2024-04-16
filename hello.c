@@ -1,4 +1,4 @@
-#!/usr/local/bin/tcc -run -I/usr/local/musl/include
+#!/usr/local/bin/tcc -run
 
 #include <stdio.h>
 
