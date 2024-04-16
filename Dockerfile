@@ -6,6 +6,7 @@ WORKDIR /src/tcc
 RUN ./configure
 RUN make -j$(nproc)
 RUN make install
+RUN make clean
 
 COPY musl /src/musl
 WORKDIR /src/musl
@@ -13,6 +14,7 @@ RUN ./configure --target=x86_64 CC='tcc' AR='tcc -ar' RANLIB='echo' LIBCC='/usr/
 RUN make -j$(nproc) CFLAGS=-g
 RUN make install
 RUN make DESTDIR=/dest install
+RUN make clean
 
 COPY libc.ld /
 
@@ -25,14 +27,17 @@ RUN ./configure \
 RUN make -j$(nproc)
 RUN make install
 RUN make DESTDIR=/dest install
+RUN make clean
 
 COPY toybox /src/toybox
+# COPY toybox.config /src/toybox/.config
 WORKDIR /src/toybox
 RUN make defconfig
 RUN make -j$(nproc) NOSTRIP=1 CC=tcc \
     CFLAGS="-nostdinc -nostdlib -I/usr/local/musl/include -I/usr/include -I/usr/include/x86_64-linux-gnu -g" \
     LDFLAGS="-nostdlib /usr/local/musl/lib/crt1.o /libc.ld -static"
-RUN PREFIX=/dest/usr/local make install
+RUN PREFIX=/dest/usr/local/bin make install_flat
+RUN make clean
 
 COPY dash /src/dash
 WORKDIR /src/dash
@@ -44,9 +49,11 @@ RUN ./configure CC=tcc \
 RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
 RUN make -j$(nproc)
 RUN make DESTDIR=/dest install
+RUN make clean
 
 FROM scratch
 COPY --from=build /dest/usr /usr
+COPY --from=build /src /src
 COPY libc.ld /usr/lib/libc.so
 COPY hello.c /usr/bin/hello
-CMD ["/usr/local/bin/ls"]
+CMD ["/usr/local/bin/dash"]
