@@ -59,16 +59,25 @@ RUN CC=tcc \
     BROKEN_TESTS="directive-export directive-export-gmake varname-dot-make-jobs" \
     /src/bmake/boot-strap --prefix=/usr/local --install-destdir=/dest --install
 
+
 FROM scratch
 COPY --from=build /dest/usr /usr
 COPY --from=build /src /src
 COPY libc.ld /usr/lib/libc.ld
 COPY hello.c /usr/bin/hello
 COPY cc.sh /usr/bin/cc
+
 SHELL ["/usr/local/bin/dash", "-c"]
 RUN ln -sv /usr/local/musl/include /usr/include
 RUN mkdir /bin
 RUN ln -sv /usr/local/bin/dash /bin/sh
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
+
 ENV CC=/usr/bin/cc
 CMD ["/usr/local/bin/dash"]
+
+COPY tcc-boot.sh /src/tcc/boot.sh
+WORKDIR /src/tcc
+RUN ./boot.sh
+
+WORKDIR /src
