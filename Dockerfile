@@ -16,7 +16,7 @@ RUN make install
 RUN make DESTDIR=/dest install
 RUN make clean
 
-COPY libc.ld /
+RUN echo "GROUP ( /usr/local/musl/lib/libc.a /usr/local/lib/tcc/libtcc1.a )" > /libc.ld
 
 WORKDIR /src/tcc
 RUN make clean
@@ -63,13 +63,12 @@ RUN CC=tcc \
 FROM scratch
 COPY --from=build /dest/usr /usr
 COPY --from=build /src /src
-COPY libc.ld /usr/lib/libc.ld
 COPY hello.c /usr/bin/hello
 COPY cc.sh /usr/bin/cc
 
 SHELL ["/usr/local/bin/dash", "-c"]
 RUN ln -sv /usr/local/musl/include /usr/include
-RUN mkdir /bin
+RUN mkdir -p /bin /usr/lib
 RUN ln -sv /usr/local/bin/dash /bin/sh
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
 
