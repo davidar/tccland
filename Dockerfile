@@ -123,5 +123,7 @@ RUN ln -sv /usr/bin/cc /usr/bin/ld
 WORKDIR /src/make
 RUN ./configure --disable-dependency-tracking
 RUN ./build.sh
+RUN ./make MAKEINFO=true
+RUN ./make MAKEINFO=true install
 
 WORKDIR /src

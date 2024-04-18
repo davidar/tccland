@@ -5,19 +5,19 @@ set -ex
 CFLAGS='-DCONFIG_TRIPLET="\"x86_64-linux-gnu\"" -DTCC_TARGET_X86_64 -DONE_SOURCE=0 -Wall -O2 -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation -Wno-stringop-truncation -I.'
 PREFIX=/boot/usr/local
 
-tcc -o tcc.o -c tcc.c $CFLAGS
-tcc -o libtcc.o -c libtcc.c $CFLAGS
+cc -o tcc.o -c tcc.c $CFLAGS
+cc -o libtcc.o -c libtcc.c $CFLAGS
 cc -DC2STR conftest.c -o c2str.exe && ./c2str.exe include/tccdefs.h tccdefs_.h
-tcc -o tccpp.o -c tccpp.c $CFLAGS
-tcc -o tccgen.o -c tccgen.c $CFLAGS
-tcc -o tccdbg.o -c tccdbg.c $CFLAGS
-tcc -o tccelf.o -c tccelf.c $CFLAGS
-tcc -o tccasm.o -c tccasm.c $CFLAGS
-tcc -o tccrun.o -c tccrun.c $CFLAGS
-tcc -o x86_64-gen.o -c x86_64-gen.c $CFLAGS
-tcc -o x86_64-link.o -c x86_64-link.c $CFLAGS
-tcc -o i386-asm.o -c i386-asm.c $CFLAGS
-tcc -ar rcs libtcc.a libtcc.o tccpp.o tccgen.o tccdbg.o tccelf.o tccasm.o tccrun.o x86_64-gen.o x86_64-link.o i386-asm.o
+cc -o tccpp.o -c tccpp.c $CFLAGS
+cc -o tccgen.o -c tccgen.c $CFLAGS
+cc -o tccdbg.o -c tccdbg.c $CFLAGS
+cc -o tccelf.o -c tccelf.c $CFLAGS
+cc -o tccasm.o -c tccasm.c $CFLAGS
+cc -o tccrun.o -c tccrun.c $CFLAGS
+cc -o x86_64-gen.o -c x86_64-gen.c $CFLAGS
+cc -o x86_64-link.o -c x86_64-link.c $CFLAGS
+cc -o i386-asm.o -c i386-asm.c $CFLAGS
+ar rcs libtcc.a libtcc.o tccpp.o tccgen.o tccdbg.o tccelf.o tccasm.o tccrun.o x86_64-gen.o x86_64-link.o i386-asm.o
 cc -o tcc tcc.o libtcc.a -lm -ldl -lpthread  
 
 cd lib

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if echo "$@" | grep -q '\-o[[:space:]]\{1,\}[^[:space:]]*\.o'; then
+if echo "$@" | grep -q '\-o[[:space:]]\{1,\}[^[:space:]]*\.o' || [ "$1" = "-c" ]; then
     # -o *.o
     exec tcc "$@"
 fi
