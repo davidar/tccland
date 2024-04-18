@@ -1,5 +1,19 @@
 FROM ubuntu:22.04 AS build
-RUN apt-get update && apt-get install -y build-essential file automake gdb
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+        autoconf \
+        automake \
+        autopoint \
+        build-essential \
+        gdb \
+        git \
+        wget
+
+COPY make /src/make
+WORKDIR /src/make
+RUN ./bootstrap --force
 
 COPY tinycc /src/tcc
 WORKDIR /src/tcc
@@ -65,6 +79,8 @@ COPY --from=build /dest/usr /usr
 COPY --from=build /src /src
 COPY hello.c /usr/bin/hello
 COPY cc.sh /usr/bin/cc
+COPY ar.sh /usr/bin/ar
+COPY ranlib.sh /usr/bin/ranlib
 
 SHELL ["/usr/local/bin/dash", "-c"]
 RUN ln -sv /usr/local/musl/include /usr/include
@@ -78,5 +94,13 @@ CMD ["/usr/local/bin/dash"]
 COPY tcc-boot.sh /src/tcc/boot.sh
 WORKDIR /src/tcc
 RUN ./boot.sh
+
+COPY sbase /src/sbase
+WORKDIR /src/sbase
+RUN bmake
+
+# WORKDIR /src/make
+# RUN ./configure
+# RUN ./build.sh
 
 WORKDIR /src

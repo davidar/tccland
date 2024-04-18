@@ -10,3 +10,9 @@
 [submodule "dash"]
 	path = dash
 	url = https://git.kernel.org/pub/scm/utils/dash/dash.git
+[submodule "make"]
+	path = make
+	url = https://git.savannah.gnu.org/git/make.git
+[submodule "sbase"]
+	path = sbase
+	url = git://git.suckless.org/sbase
