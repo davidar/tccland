@@ -9,6 +9,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         build-essential \
         gdb \
         git \
+        pkgconf \
         wget
 
 COPY make /src/make
@@ -98,9 +99,14 @@ RUN ./boot.sh
 COPY sbase /src/sbase
 WORKDIR /src/sbase
 RUN bmake
+RUN bmake install PREFIX=/usr/local/sbase
+RUN ln -sv /usr/local/sbase/bin/expr /usr/bin/expr
+RUN ln -sv /usr/local/sbase/bin/tr /usr/bin/tr
 
-# WORKDIR /src/make
-# RUN ./configure
-# RUN ./build.sh
+COPY grep.sh /usr/bin/grep
+RUN ln -sv /usr/bin/cc /usr/bin/ld
+WORKDIR /src/make
+RUN ./configure
+RUN ./build.sh
 
 WORKDIR /src
