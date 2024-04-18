@@ -16,3 +16,6 @@
 [submodule "sbase"]
 	path = sbase
 	url = git://git.suckless.org/sbase
+[submodule "awk"]
+	path = awk
+	url = https://github.com/onetrueawk/awk.git
