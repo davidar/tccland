@@ -118,10 +118,8 @@ WORKDIR /src/awk
 RUN bmake YACC="yacc -d -b awkgram"
 RUN cp a.out /usr/bin/awk
 
-COPY grep.sh /usr/bin/grep
-RUN ln -sv /usr/bin/cc /usr/bin/ld
 WORKDIR /src/make
-RUN ./configure --disable-dependency-tracking
+RUN ./configure --disable-dependency-tracking LD=/usr/bin/cc
 RUN ./build.sh
 RUN ./make MAKEINFO=true
 RUN ./make MAKEINFO=true install
