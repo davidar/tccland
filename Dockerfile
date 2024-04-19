@@ -118,14 +118,16 @@ RUN bmake YACC="yacc -d -b awkgram"
 RUN cp a.out /usr/bin/awk
 
 WORKDIR /src/make
-RUN ./configure --disable-dependency-tracking LD=/usr/bin/cc
+RUN ./configure --disable-dependency-tracking LD=cc
 RUN ./build.sh
 RUN ./make MAKEINFO=true
 RUN ./make MAKEINFO=true install
 
 WORKDIR /src/musl
-RUN ./configure
+RUN rm -rf /usr/local/musl
+RUN ./configure CC=tcc
 RUN make -j$(nproc) CFLAGS=-g
+RUN make install
 
 COPY hello.c /src/hello.c
 WORKDIR /src
