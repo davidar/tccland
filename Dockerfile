@@ -88,19 +88,18 @@ RUN make clean
 FROM scratch
 COPY --from=build /dest/usr /usr
 COPY --from=build /src /src
-COPY hello.c /usr/bin/hello
 COPY cc.sh /usr/bin/cc
 COPY ar.sh /usr/bin/ar
 COPY ranlib.sh /usr/bin/ranlib
 
 SHELL ["/usr/local/bin/dash", "-c"]
+CMD ["/usr/local/bin/dash"]
+ENV CC=/usr/bin/cc
+
+RUN mkdir -p /bin /usr/lib /tmp
 RUN ln -sv /usr/local/musl/include /usr/include
-RUN mkdir -p /bin /usr/lib
 RUN ln -sv /usr/local/bin/dash /bin/sh
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
-
-ENV CC=/usr/bin/cc
-CMD ["/usr/local/bin/dash"]
 
 COPY tcc-boot.sh /src/tcc/boot.sh
 WORKDIR /src/tcc
@@ -124,4 +123,9 @@ RUN ./build.sh
 RUN ./make MAKEINFO=true
 RUN ./make MAKEINFO=true install
 
+WORKDIR /src/musl
+RUN ./configure
+RUN make -j$(nproc) CFLAGS=-g
+
+COPY hello.c /src/hello.c
 WORKDIR /src
