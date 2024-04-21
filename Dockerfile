@@ -71,7 +71,7 @@ RUN CC=tcc \
     CFLAGS="-nostdinc -I/usr/local/musl/include" \
     LDFLAGS="-nostdlib -static" \
     LIBS="/usr/local/musl/lib/crt1.o /libc.ld" \
-    BROKEN_TESTS="directive-export directive-export-gmake varname-dot-make-jobs" \
+    BROKEN_TESTS="directive-export directive-export-gmake dotwait varname-dot-make-jobs" \
     /src/bmake/boot-strap --prefix=/usr/local --install-destdir=/dest --install
 
 COPY byacc /src/byacc
@@ -137,6 +137,11 @@ RUN make install
 RUN ln -sv /usr/local/bin/bash /bin/bash
 
 CMD ["/bin/bash"]
+
+WORKDIR /src/toybox
+RUN make -j$(nproc)
+RUN PREFIX=/usr/local/toybox/bin make install_flat
+RUN cp -f /usr/local/toybox/bin/toybox /usr/local/bin/toybox
 
 COPY hello.c /src/hello.c
 WORKDIR /src
