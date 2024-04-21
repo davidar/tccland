@@ -142,12 +142,17 @@ RUN make -j$(nproc)
 RUN make install
 RUN ln -sv /usr/local/bin/bash /bin/bash
 
-CMD ["/bin/bash"]
-
 WORKDIR /src/toybox
 RUN make -j$(nproc)
 RUN PREFIX=/usr/local/toybox/bin make install_flat
 RUN cp -f /usr/local/toybox/bin/toybox /usr/local/bin/toybox
+
+WORKDIR /src/oksh
+RUN ./configure
+RUN make -j$(nproc)
+RUN make install
+
+CMD ["/bin/sh"]
 
 COPY hello.c /src/hello.c
 WORKDIR /src
