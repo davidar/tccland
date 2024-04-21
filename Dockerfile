@@ -93,7 +93,7 @@ COPY ar.sh /usr/bin/ar
 COPY ranlib.sh /usr/bin/ranlib
 
 SHELL ["/usr/local/bin/dash", "-c"]
-CMD ["/usr/local/bin/dash"]
+# CMD ["/usr/local/bin/dash"]
 ENV CC=/usr/bin/cc
 
 RUN mkdir -p /bin /usr/lib /tmp
@@ -128,6 +128,15 @@ RUN rm -rf /usr/local/musl
 RUN ./configure CC=tcc
 RUN make -j$(nproc) CFLAGS=-g
 RUN make install
+
+COPY bash /src/bash
+WORKDIR /src/bash
+RUN ./configure --without-bash-malloc LD=cc
+RUN make -j$(nproc)
+RUN make install
+RUN ln -sv /usr/local/bin/bash /bin/bash
+
+CMD ["/bin/bash"]
 
 COPY hello.c /src/hello.c
 WORKDIR /src

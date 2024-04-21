@@ -19,3 +19,9 @@
 [submodule "awk"]
 	path = awk
 	url = https://github.com/onetrueawk/awk.git
+[submodule "bash"]
+	path = bash
+	url = https://git.savannah.gnu.org/git/bash.git
+[submodule "heirloom-ng"]
+	path = heirloom-ng
+	url = https://github.com/Projeto-Pindorama/heirloom-ng.git
