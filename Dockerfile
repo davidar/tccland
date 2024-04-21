@@ -66,23 +66,23 @@ RUN make -j$(nproc)
 RUN make DESTDIR=/dest install
 RUN make clean
 
-COPY bmake /src/bmake
-RUN CC=tcc \
-    CFLAGS="-nostdinc -I/usr/local/musl/include" \
-    LDFLAGS="-nostdlib -static" \
-    LIBS="/usr/local/musl/lib/crt1.o /libc.ld" \
-    BROKEN_TESTS="directive-export directive-export-gmake dotwait varname-dot-make-jobs" \
-    /src/bmake/boot-strap --prefix=/usr/local --install-destdir=/dest --install
+# COPY bmake /src/bmake
+# RUN CC=tcc \
+#     CFLAGS="-nostdinc -I/usr/local/musl/include" \
+#     LDFLAGS="-nostdlib -static" \
+#     LIBS="/usr/local/musl/lib/crt1.o /libc.ld" \
+#     BROKEN_TESTS="directive-export directive-export-gmake dotwait varname-dot-make-jobs" \
+#     /src/bmake/boot-strap --prefix=/usr/local --install-destdir=/dest --install
 
-COPY byacc /src/byacc
-WORKDIR /src/byacc
-RUN ./configure
-RUN make CC=tcc \
-    CFLAGS="-nostdinc -I/usr/local/musl/include" \
-    LDFLAGS="-nostdlib -static" \
-    LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
-RUN make DESTDIR=/dest install
-RUN make clean
+# COPY byacc /src/byacc
+# WORKDIR /src/byacc
+# RUN ./configure
+# RUN make CC=tcc \
+#     CFLAGS="-nostdinc -I/usr/local/musl/include" \
+#     LDFLAGS="-nostdlib -static" \
+#     LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
+# RUN make DESTDIR=/dest install
+# RUN make clean
 
 
 FROM scratch
@@ -105,17 +105,17 @@ COPY tcc-boot.sh /src/tcc/boot.sh
 WORKDIR /src/tcc
 RUN ./boot.sh
 
-COPY sbase /src/sbase
-WORKDIR /src/sbase
-RUN bmake
-RUN bmake install PREFIX=/usr/local/sbase
-RUN ln -sv /usr/local/sbase/bin/expr /usr/bin/expr
-RUN ln -sv /usr/local/sbase/bin/tr /usr/bin/tr
+# COPY sbase /src/sbase
+# WORKDIR /src/sbase
+# RUN bmake
+# RUN bmake install PREFIX=/usr/local/sbase
+# RUN ln -sv /usr/local/sbase/bin/expr /usr/bin/expr
+# RUN ln -sv /usr/local/sbase/bin/tr /usr/bin/tr
 
-COPY awk /src/awk
-WORKDIR /src/awk
-RUN bmake YACC="yacc -d -b awkgram"
-RUN cp a.out /usr/bin/awk
+# COPY awk /src/awk
+# WORKDIR /src/awk
+# RUN bmake YACC="yacc -d -b awkgram"
+# RUN cp a.out /usr/bin/awk
 
 WORKDIR /src/make
 RUN ./configure --disable-dependency-tracking LD=cc
