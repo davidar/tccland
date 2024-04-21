@@ -25,3 +25,6 @@
 [submodule "heirloom-ng"]
 	path = heirloom-ng
 	url = https://github.com/Projeto-Pindorama/heirloom-ng.git
+[submodule "oksh"]
+	path = oksh
+	url = https://github.com/ibara/oksh.git

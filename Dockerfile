@@ -54,17 +54,17 @@ RUN make -j$(nproc) NOSTRIP=1 CC=tcc \
 RUN PREFIX=/dest/usr/local/bin make install_flat
 RUN make clean
 
-COPY dash /src/dash
-WORKDIR /src/dash
-RUN ./autogen.sh
-RUN ./configure CC=tcc \
-    CFLAGS="-nostdinc -I/usr/local/musl/include" \
-    LDFLAGS="-nostdlib -static" \
-    LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
-RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
-RUN make -j$(nproc)
-RUN make DESTDIR=/dest install
-RUN make clean
+# COPY dash /src/dash
+# WORKDIR /src/dash
+# RUN ./autogen.sh
+# RUN ./configure CC=tcc \
+#     CFLAGS="-nostdinc -I/usr/local/musl/include" \
+#     LDFLAGS="-nostdlib -static" \
+#     LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
+# RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
+# RUN make -j$(nproc)
+# RUN make DESTDIR=/dest install
+# RUN make clean
 
 # COPY bmake /src/bmake
 # RUN CC=tcc \
@@ -84,6 +84,13 @@ RUN make clean
 # RUN make DESTDIR=/dest install
 # RUN make clean
 
+COPY oksh /src/oksh
+WORKDIR /src/oksh
+RUN ./configure --cc=tcc --cflags="-nostdinc -I/usr/local/musl/include"
+RUN make -j$(nproc) LDFLAGS="-nostdlib -static" LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
+RUN make DESTDIR=/dest install
+RUN make clean
+
 
 FROM scratch
 COPY --from=build /dest/usr /usr
@@ -92,13 +99,12 @@ COPY cc.sh /usr/bin/cc
 COPY ar.sh /usr/bin/ar
 COPY ranlib.sh /usr/bin/ranlib
 
-SHELL ["/usr/local/bin/dash", "-c"]
-# CMD ["/usr/local/bin/dash"]
+SHELL ["/usr/local/bin/oksh", "-c"]
 ENV CC=/usr/bin/cc
 
 RUN mkdir -p /bin /usr/lib /tmp
+RUN ln -sv /usr/local/bin/oksh /bin/sh
 RUN ln -sv /usr/local/musl/include /usr/include
-RUN ln -sv /usr/local/bin/dash /bin/sh
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
 
 COPY tcc-boot.sh /src/tcc/boot.sh
