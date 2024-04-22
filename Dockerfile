@@ -12,10 +12,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         pkgconf \
         wget
 
-COPY ports/gnu/make /src/make
-WORKDIR /src/make
-RUN ./bootstrap --force
-
 COPY src/tcc /src/tcc
 WORKDIR /src/tcc
 RUN ./configure
@@ -107,6 +103,8 @@ RUN ln -sv /usr/local/bin/oksh /bin/sh
 RUN ln -sv /usr/local/musl/include /usr/include
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
 
+CMD ["/bin/sh"]
+
 COPY src/tcc-boot.sh /src/tcc/boot.sh
 WORKDIR /src/tcc
 RUN ./boot.sh
@@ -123,7 +121,10 @@ RUN ./boot.sh
 # RUN bmake YACC="yacc -d -b awkgram"
 # RUN cp a.out /usr/bin/awk
 
-WORKDIR /src/make
+ADD https://ftp.gnu.org/gnu/make/make-4.4.tar.gz /src/make-4.4.tar.gz
+WORKDIR /src
+RUN tar -xf make-4.4.tar.gz
+WORKDIR /src/make-4.4
 RUN ./configure --disable-dependency-tracking LD=cc
 RUN ./build.sh
 RUN ./make MAKEINFO=true
@@ -135,8 +136,10 @@ RUN ./configure CC=tcc
 RUN make -j$(nproc) CFLAGS=-g
 RUN make install
 
-COPY ports/gnu/bash /src/bash
-WORKDIR /src/bash
+ADD https://ftp.gnu.org/gnu/bash/bash-5.2.21.tar.gz /src/bash-5.2.21.tar.gz
+WORKDIR /src
+RUN tar -xf bash-5.2.21.tar.gz
+WORKDIR /src/bash-5.2.21
 RUN ./configure --without-bash-malloc LD=cc
 RUN make -j$(nproc)
 RUN make install
@@ -160,7 +163,4 @@ RUN ./Configure -des -Uusenm -Uusedl -DEBUGGING=both
 RUN make -j$(nproc)
 RUN make install
 
-CMD ["/bin/sh"]
-
-COPY hello.c /src/hello.c
 WORKDIR /src

@@ -10,30 +10,18 @@
 [submodule "dash"]
 	path = ports/bsd/dash
 	url = https://git.kernel.org/pub/scm/utils/dash/dash.git
-[submodule "make"]
-	path = ports/gnu/make
-	url = https://git.savannah.gnu.org/git/make.git
 [submodule "sbase"]
 	path = ports/posix/sbase
 	url = git://git.suckless.org/sbase
 [submodule "awk"]
 	path = ports/bsd/awk
 	url = https://github.com/onetrueawk/awk.git
-[submodule "bash"]
-	path = ports/gnu/bash
-	url = https://git.savannah.gnu.org/git/bash.git
 [submodule "heirloom-ng"]
 	path = ports/unix/heirloom-ng
 	url = https://github.com/Projeto-Pindorama/heirloom-ng.git
 [submodule "oksh"]
 	path = src/oksh
 	url = https://github.com/ibara/oksh.git
-[submodule "m4"]
-	path = ports/gnu/m4
-	url = git://git.sv.gnu.org/m4
-[submodule "autoconf"]
-	path = ports/gnu/autoconf
-	url = git://git.sv.gnu.org/autoconf
 [submodule "perl5"]
 	path = ports/lang/perl5
 	url = https://github.com/Perl/perl5.git
