@@ -12,18 +12,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         pkgconf \
         wget
 
-COPY make /src/make
+COPY ports/gnu/make /src/make
 WORKDIR /src/make
 RUN ./bootstrap --force
 
-COPY tinycc /src/tcc
+COPY src/tcc /src/tcc
 WORKDIR /src/tcc
 RUN ./configure
 RUN make -j$(nproc)
 RUN make install
 RUN make clean
 
-COPY musl /src/musl
+COPY src/musl /src/musl
 WORKDIR /src/musl
 RUN ./configure --target=x86_64 CC='tcc' AR='tcc -ar' RANLIB='echo' LIBCC='/usr/local/lib/tcc/libtcc1.a'
 RUN make -j$(nproc) CFLAGS=-g
@@ -44,8 +44,8 @@ RUN make install
 RUN make DESTDIR=/dest install
 RUN make clean
 
-COPY toybox /src/toybox
-COPY toybox.config /src/toybox/.config
+COPY src/toybox /src/toybox
+COPY src/toybox.config /src/toybox/.config
 WORKDIR /src/toybox
 # RUN make defconfig
 RUN make -j$(nproc) NOSTRIP=1 CC=tcc \
@@ -84,7 +84,7 @@ RUN make clean
 # RUN make DESTDIR=/dest install
 # RUN make clean
 
-COPY oksh /src/oksh
+COPY src/oksh /src/oksh
 WORKDIR /src/oksh
 RUN ./configure --cc=tcc --cflags="-nostdinc -I/usr/local/musl/include"
 RUN make -j$(nproc) LDFLAGS="-nostdlib -static" LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
@@ -95,9 +95,9 @@ RUN make clean
 FROM scratch AS stage-1
 COPY --from=stage-0 /dest/usr /usr
 COPY --from=stage-0 /src /src
-COPY cc.sh /usr/bin/cc
-COPY ar.sh /usr/bin/ar
-COPY ranlib.sh /usr/bin/ranlib
+COPY src/bin/cc.sh /usr/bin/cc
+COPY src/bin/ar.sh /usr/bin/ar
+COPY src/bin/ranlib.sh /usr/bin/ranlib
 
 SHELL ["/usr/local/bin/oksh", "-c"]
 ENV CC=/usr/bin/cc
@@ -107,7 +107,7 @@ RUN ln -sv /usr/local/bin/oksh /bin/sh
 RUN ln -sv /usr/local/musl/include /usr/include
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
 
-COPY tcc-boot.sh /src/tcc/boot.sh
+COPY src/tcc-boot.sh /src/tcc/boot.sh
 WORKDIR /src/tcc
 RUN ./boot.sh
 
@@ -135,7 +135,7 @@ RUN ./configure CC=tcc
 RUN make -j$(nproc) CFLAGS=-g
 RUN make install
 
-COPY bash /src/bash
+COPY ports/gnu/bash /src/bash
 WORKDIR /src/bash
 RUN ./configure --without-bash-malloc LD=cc
 RUN make -j$(nproc)
@@ -152,8 +152,8 @@ RUN ./configure
 RUN make -j$(nproc)
 RUN make install
 
-COPY perl5 /src/perl5
-COPY perl5.patch /tmp/perl5.patch
+COPY ports/lang/perl5 /src/perl5
+COPY ports/lang/perl5.patch /tmp/perl5.patch
 WORKDIR /src/perl5
 RUN patch -p1 < /tmp/perl5.patch
 RUN ./Configure -des -Uusenm -Uusedl -DEBUGGING=both

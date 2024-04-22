@@ -1,39 +1,39 @@
 [submodule "tinycc"]
-	path = tinycc
+	path = src/tcc
 	url = https://github.com/davidar/tinycc.git
 [submodule "musl"]
-	path = musl
+	path = src/musl
 	url = https://github.com/davidar/musl.git
 [submodule "toybox"]
-	path = toybox
+	path = src/toybox
 	url = https://github.com/davidar/toybox.git
 [submodule "dash"]
-	path = dash
+	path = ports/bsd/dash
 	url = https://git.kernel.org/pub/scm/utils/dash/dash.git
 [submodule "make"]
-	path = make
+	path = ports/gnu/make
 	url = https://git.savannah.gnu.org/git/make.git
 [submodule "sbase"]
-	path = sbase
+	path = ports/posix/sbase
 	url = git://git.suckless.org/sbase
 [submodule "awk"]
-	path = awk
+	path = ports/bsd/awk
 	url = https://github.com/onetrueawk/awk.git
 [submodule "bash"]
-	path = bash
+	path = ports/gnu/bash
 	url = https://git.savannah.gnu.org/git/bash.git
 [submodule "heirloom-ng"]
-	path = heirloom-ng
+	path = ports/unix/heirloom-ng
 	url = https://github.com/Projeto-Pindorama/heirloom-ng.git
 [submodule "oksh"]
-	path = oksh
+	path = src/oksh
 	url = https://github.com/ibara/oksh.git
 [submodule "m4"]
-	path = m4
+	path = ports/gnu/m4
 	url = git://git.sv.gnu.org/m4
 [submodule "autoconf"]
-	path = autoconf
+	path = ports/gnu/autoconf
 	url = git://git.sv.gnu.org/autoconf
 [submodule "perl5"]
-	path = perl5
+	path = ports/lang/perl5
 	url = https://github.com/Perl/perl5.git
