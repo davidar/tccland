@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 AS build
+FROM ubuntu:22.04 AS stage-0
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -92,9 +92,9 @@ RUN make DESTDIR=/dest install
 RUN make clean
 
 
-FROM scratch
-COPY --from=build /dest/usr /usr
-COPY --from=build /src /src
+FROM scratch AS stage-1
+COPY --from=stage-0 /dest/usr /usr
+COPY --from=stage-0 /src /src
 COPY cc.sh /usr/bin/cc
 COPY ar.sh /usr/bin/ar
 COPY ranlib.sh /usr/bin/ranlib
@@ -149,6 +149,14 @@ RUN cp -f /usr/local/toybox/bin/toybox /usr/local/bin/toybox
 
 WORKDIR /src/oksh
 RUN ./configure
+RUN make -j$(nproc)
+RUN make install
+
+COPY perl5 /src/perl5
+COPY perl5.patch /tmp/perl5.patch
+WORKDIR /src/perl5
+RUN patch -p1 < /tmp/perl5.patch
+RUN ./Configure -des -Uusenm -Uusedl -DEBUGGING=both
 RUN make -j$(nproc)
 RUN make install
 

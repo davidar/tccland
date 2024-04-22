@@ -28,3 +28,12 @@
 [submodule "oksh"]
 	path = oksh
 	url = https://github.com/ibara/oksh.git
+[submodule "m4"]
+	path = m4
+	url = git://git.sv.gnu.org/m4
+[submodule "autoconf"]
+	path = autoconf
+	url = git://git.sv.gnu.org/autoconf
+[submodule "perl5"]
+	path = perl5
+	url = https://github.com/Perl/perl5.git
