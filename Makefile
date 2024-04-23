@@ -2,6 +2,8 @@ all: build run
 
 build:
 	docker build . -t tccland --progress=plain
+
+rootfs:
 	ID=$$(docker create tccland) && rm -rf rootfs && mkdir -p rootfs && \
 		docker export $$ID | tar -x -C rootfs && docker rm $$ID
 

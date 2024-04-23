@@ -25,3 +25,6 @@
 [submodule "perl5"]
 	path = ports/lang/perl5
 	url = https://github.com/Perl/perl5.git
+[submodule "libretls"]
+	path = ports/bsd/libretls
+	url = https://git.causal.agency/libretls

@@ -163,4 +163,38 @@ RUN ./Configure -des -Uusenm -Uusedl -DEBUGGING=both
 RUN make -j$(nproc)
 RUN make install
 
+ADD https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz /src/m4-1.4.19.tar.gz
+WORKDIR /src
+RUN tar -xf m4-1.4.19.tar.gz
+WORKDIR /src/m4-1.4.19
+RUN ./configure LD=cc
+RUN make
+RUN make install
+
+ADD https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz /src/autoconf-2.69.tar.gz
+WORKDIR /src
+RUN tar -xf autoconf-2.69.tar.gz
+WORKDIR /src/autoconf-2.69
+RUN ./configure
+RUN make
+RUN make install
+
+ADD https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz /src/automake-1.16.5.tar.gz
+WORKDIR /src
+RUN tar -xf automake-1.16.5.tar.gz
+WORKDIR /src/automake-1.16.5
+RUN ./configure
+RUN make
+RUN make install
+
+ADD https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz /src/libtool-2.4.7.tar.gz
+WORKDIR /src
+RUN tar -xf libtool-2.4.7.tar.gz
+WORKDIR /src/libtool-2.4.7
+RUN ./configure --disable-shared LD=cc
+RUN make
+RUN make install
+
+RUN ln -sv /usr/local/bin/env /usr/bin/env
+
 WORKDIR /src
