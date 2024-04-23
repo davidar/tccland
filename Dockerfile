@@ -91,17 +91,14 @@ RUN make clean
 FROM scratch AS stage-1
 COPY --from=stage-0 /dest/usr /usr
 COPY --from=stage-0 /src /src
-COPY src/bin/cc.sh /usr/bin/cc
-COPY src/bin/ar.sh /usr/bin/ar
-COPY src/bin/ranlib.sh /usr/bin/ranlib
 
 SHELL ["/usr/local/bin/oksh", "-c"]
-ENV CC=/usr/bin/cc
 
 RUN mkdir -p /bin /usr/lib /tmp
 RUN ln -sv /usr/local/bin/oksh /bin/sh
 RUN ln -sv /usr/local/musl/include /usr/include
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
+RUN ln -sv /usr/local/bin/tcc /bin/cc
 
 CMD ["/bin/sh"]
 
@@ -125,14 +122,14 @@ ADD https://ftp.gnu.org/gnu/make/make-4.4.tar.gz /src/make-4.4.tar.gz
 WORKDIR /src
 RUN tar -xf make-4.4.tar.gz
 WORKDIR /src/make-4.4
-RUN ./configure --disable-dependency-tracking LD=cc
+RUN ./configure --disable-dependency-tracking LD=cc AR="tcc -ar"
 RUN ./build.sh
 RUN ./make MAKEINFO=true
 RUN ./make MAKEINFO=true install
 
 WORKDIR /src/musl
 RUN rm -rf /usr/local/musl
-RUN ./configure CC=tcc
+RUN ./configure CC=tcc AR="tcc -ar" RANLIB=echo
 RUN make -j$(nproc) CFLAGS=-g
 RUN make install
 
@@ -140,7 +137,7 @@ ADD https://ftp.gnu.org/gnu/bash/bash-5.2.21.tar.gz /src/bash-5.2.21.tar.gz
 WORKDIR /src
 RUN tar -xf bash-5.2.21.tar.gz
 WORKDIR /src/bash-5.2.21
-RUN ./configure --without-bash-malloc LD=cc
+RUN ./configure --without-bash-malloc LD=cc AR="tcc -ar"
 RUN make -j$(nproc)
 RUN make install
 RUN ln -sv /usr/local/bin/bash /bin/bash
@@ -160,14 +157,14 @@ COPY ports/lang/perl5.patch /tmp/perl5.patch
 WORKDIR /src/perl5
 RUN patch -p1 < /tmp/perl5.patch
 RUN ./Configure -des -Uusenm -Uusedl -DEBUGGING=both
-RUN make -j$(nproc)
+RUN make -j$(nproc) AR="tcc -ar"
 RUN make install
 
 ADD https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz /src/m4-1.4.19.tar.gz
 WORKDIR /src
 RUN tar -xf m4-1.4.19.tar.gz
 WORKDIR /src/m4-1.4.19
-RUN ./configure LD=cc
+RUN ./configure LD=cc AR="tcc -ar"
 RUN make
 RUN make install
 
@@ -191,17 +188,18 @@ ADD https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz /src/libtool-2.4.7.tar.
 WORKDIR /src
 RUN tar -xf libtool-2.4.7.tar.gz
 WORKDIR /src/libtool-2.4.7
-RUN ./configure --disable-shared LD=cc
+RUN ./configure --disable-shared LD=cc AR="tcc -ar"
 RUN make
 RUN make install
 
+RUN mkdir -p /usr/bin
 RUN ln -sv /usr/local/bin/env /usr/bin/env
 
 ADD https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz /src/gawk-5.3.0.tar.gz
 WORKDIR /src
 RUN tar -xf gawk-5.3.0.tar.gz
 WORKDIR /src/gawk-5.3.0
-RUN ./configure --disable-shared LD=cc
+RUN ./configure --disable-shared LD=cc AR="tcc -ar"
 RUN make
 RUN make install
 
@@ -209,7 +207,7 @@ ADD https://ftp.gnu.org/gnu/binutils/binutils-2.39.tar.gz /src/binutils-2.39.tar
 WORKDIR /src
 RUN tar -xf binutils-2.39.tar.gz
 WORKDIR /src/binutils-2.39
-RUN ./configure --disable-gprofng CFLAGS='-O2 -D__LITTLE_ENDIAN__=1'
+RUN ./configure --disable-gprofng CFLAGS='-O2 -D__LITTLE_ENDIAN__=1' AR="tcc -ar"
 RUN make MAKEINFO=true
 RUN make MAKEINFO=true install
 

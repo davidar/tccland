@@ -2,23 +2,25 @@
 
 set -ex
 
+CC=tcc
+AR='tcc -ar'
 CFLAGS='-DCONFIG_TRIPLET="\"x86_64-linux-gnu\"" -DTCC_TARGET_X86_64 -DONE_SOURCE=0 -Wall -O2 -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation -Wno-stringop-truncation -I.'
 PREFIX=/boot/usr/local
 
-cc -o tcc.o -c tcc.c $CFLAGS
-cc -o libtcc.o -c libtcc.c $CFLAGS
-cc -DC2STR conftest.c -o c2str.exe && ./c2str.exe include/tccdefs.h tccdefs_.h
-cc -o tccpp.o -c tccpp.c $CFLAGS
-cc -o tccgen.o -c tccgen.c $CFLAGS
-cc -o tccdbg.o -c tccdbg.c $CFLAGS
-cc -o tccelf.o -c tccelf.c $CFLAGS
-cc -o tccasm.o -c tccasm.c $CFLAGS
-cc -o tccrun.o -c tccrun.c $CFLAGS
-cc -o x86_64-gen.o -c x86_64-gen.c $CFLAGS
-cc -o x86_64-link.o -c x86_64-link.c $CFLAGS
-cc -o i386-asm.o -c i386-asm.c $CFLAGS
-ar rcs libtcc.a libtcc.o tccpp.o tccgen.o tccdbg.o tccelf.o tccasm.o tccrun.o x86_64-gen.o x86_64-link.o i386-asm.o
-cc -o tcc tcc.o libtcc.a -lm -ldl -lpthread  
+$CC -o tcc.o -c tcc.c $CFLAGS
+$CC -o libtcc.o -c libtcc.c $CFLAGS
+$CC -DC2STR conftest.c -o c2str.exe && ./c2str.exe include/tccdefs.h tccdefs_.h
+$CC -o tccpp.o -c tccpp.c $CFLAGS
+$CC -o tccgen.o -c tccgen.c $CFLAGS
+$CC -o tccdbg.o -c tccdbg.c $CFLAGS
+$CC -o tccelf.o -c tccelf.c $CFLAGS
+$CC -o tccasm.o -c tccasm.c $CFLAGS
+$CC -o tccrun.o -c tccrun.c $CFLAGS
+$CC -o x86_64-gen.o -c x86_64-gen.c $CFLAGS
+$CC -o x86_64-link.o -c x86_64-link.c $CFLAGS
+$CC -o i386-asm.o -c i386-asm.c $CFLAGS
+$AR rcs libtcc.a libtcc.o tccpp.o tccgen.o tccdbg.o tccelf.o tccasm.o tccrun.o x86_64-gen.o x86_64-link.o i386-asm.o
+$CC -o tcc tcc.o libtcc.a -lm -ldl -lpthread  
 
 cd lib
 ../tcc -c libtcc1.c -o libtcc1.o -B.. -I..
