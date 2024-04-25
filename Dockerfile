@@ -47,10 +47,11 @@ WORKDIR /src/toybox
 RUN make -j$(nproc) NOSTRIP=1 CC=tcc \
     CFLAGS="-nostdinc -nostdlib -I/usr/local/musl/include -I/usr/include -I/usr/include/x86_64-linux-gnu -g" \
     LDFLAGS="-nostdlib /usr/local/musl/lib/crt1.o /libc.ld -static"
-RUN PREFIX=/dest/usr/local/bin make install_flat
-RUN make clean
+# RUN PREFIX=/dest/usr/local/bin make install_flat
+# RUN make clean
+RUN rm generated/obj/main.o
 
-COPY ports/bsd/dash /src/dash
+COPY src/dash /src/dash
 WORKDIR /src/dash
 RUN ./autogen.sh
 RUN ./configure CC=tcc \
@@ -118,6 +119,11 @@ RUN ./boot.sh
 # RUN bmake YACC="yacc -d -b awkgram"
 # RUN cp a.out /usr/bin/awk
 
+RUN for cmd in grep sed awk rm mkdir cp echo true chmod ls; do \
+        printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
+        chmod +x /usr/local/bin/$cmd; \
+    done
+
 ADD https://ftp.gnu.org/gnu/make/make-4.4.tar.gz /src/make-4.4.tar.gz
 WORKDIR /src
 RUN tar -xf make-4.4.tar.gz
@@ -142,15 +148,27 @@ RUN make -j$(nproc)
 RUN make install
 RUN ln -sv /usr/local/bin/bash /bin/bash
 
+RUN for cmd in sort xargs readlink tr uname cmp dirname basename head wc cat egrep fold tee gzip od ln; do \
+        printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
+        chmod +x /usr/local/bin/$cmd; \
+    done
+
 WORKDIR /src/toybox
+RUN make clean
 RUN make -j$(nproc)
-RUN PREFIX=/usr/local/toybox/bin make install_flat
-RUN cp -f /usr/local/toybox/bin/toybox /usr/local/bin/toybox
+# RUN PREFIX=/usr/local/toybox/bin make install_flat
+# RUN cp -f /usr/local/toybox/bin/toybox /usr/local/bin/toybox
+RUN rm generated/obj/main.o
 
 # WORKDIR /src/oksh
 # RUN ./configure
 # RUN make -j$(nproc)
 # RUN make install
+
+RUN for cmd in comm expr touch uniq mv; do \
+        printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
+        chmod +x /usr/local/bin/$cmd; \
+    done
 
 COPY ports/lang/perl5 /src/perl5
 COPY ports/lang/perl5.patch /tmp/perl5.patch
@@ -158,6 +176,7 @@ WORKDIR /src/perl5
 RUN patch -p1 < /tmp/perl5.patch
 RUN ./Configure -des -Uusenm -Uusedl -DEBUGGING=both
 RUN make -j$(nproc) AR="tcc -ar"
+# RUN make test
 RUN make install
 
 ADD https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz /src/m4-1.4.19.tar.gz
@@ -192,15 +211,20 @@ RUN ./configure --disable-shared LD=cc AR="tcc -ar"
 RUN make
 RUN make install
 
+RUN for cmd in env; do \
+        printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
+        chmod +x /usr/local/bin/$cmd; \
+    done
+
 RUN mkdir -p /usr/bin
 RUN ln -sv /usr/local/bin/env /usr/bin/env
 
-WORKDIR /src/dash
-RUN ./autogen.sh
-RUN ./configure
-RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
-RUN make -j$(nproc)
-RUN make install
+# WORKDIR /src/dash
+# RUN ./autogen.sh
+# RUN ./configure
+# RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
+# RUN make -j$(nproc)
+# RUN make install
 
 ADD https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz /src/gawk-5.3.0.tar.gz
 WORKDIR /src
@@ -219,6 +243,11 @@ RUN make MAKEINFO=true
 RUN make MAKEINFO=true install
 
 RUN ln -s /usr/lib/x86_64-linux-gnu /usr/lib64
+
+RUN for cmd in bzcat; do \
+        printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
+        chmod +x /usr/local/bin/$cmd; \
+    done
 
 ADD https://ftp.gnu.org/gnu/gcc/gcc-4.6.4/gcc-4.6.4.tar.gz /src/gcc-4.6.4.tar.gz
 ADD https://gcc.gnu.org/pub/gcc/infrastructure/mpfr-2.4.2.tar.bz2 /src/mpfr-2.4.2.tar.bz2

@@ -8,8 +8,8 @@
 	path = src/toybox
 	url = https://github.com/davidar/toybox.git
 [submodule "dash"]
-	path = ports/bsd/dash
-	url = https://git.kernel.org/pub/scm/utils/dash/dash.git
+	path = src/dash
+	url = https://github.com/davidar/dash.git
 [submodule "sbase"]
 	path = ports/posix/sbase
 	url = git://git.suckless.org/sbase
