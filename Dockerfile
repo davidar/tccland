@@ -278,4 +278,7 @@ RUN ./configure CFLAGS=-O2 CFLAGS_FOR_TARGET=-O2 \
 RUN make
 RUN make install
 
+COPY src/test.c /src/test.c
 WORKDIR /src
+RUN gcc -o test test.c -static
+RUN ./test
