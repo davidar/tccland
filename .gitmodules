@@ -21,7 +21,7 @@
 	url = https://github.com/Projeto-Pindorama/heirloom-ng.git
 [submodule "oksh"]
 	path = src/oksh
-	url = https://github.com/ibara/oksh.git
+	url = https://github.com/davidar/oksh.git
 [submodule "perl5"]
 	path = ports/lang/perl5
 	url = https://github.com/Perl/perl5.git

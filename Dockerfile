@@ -82,8 +82,8 @@ RUN make clean
 
 COPY src/oksh /src/oksh
 WORKDIR /src/oksh
-RUN ./configure --cc=tcc --cflags="-nostdinc -I/usr/local/musl/include"
-RUN make -j$(nproc) LDFLAGS="-nostdlib -static" LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
+RUN ./configure --cc=tcc --cflags="-nostdinc -I/usr/local/musl/include -g" --no-strip
+RUN make -j$(nproc)
 RUN make DESTDIR=/dest install
 RUN make clean
 
