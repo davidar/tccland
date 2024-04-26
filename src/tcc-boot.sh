@@ -4,7 +4,7 @@ set -ex
 
 CC=tcc
 AR='tcc -ar'
-CFLAGS='-DCONFIG_TRIPLET="\"x86_64-linux-gnu\"" -DTCC_TARGET_X86_64 -DONE_SOURCE=0 -Wall -O2 -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation -Wno-stringop-truncation -I.'
+CFLAGS='-DCONFIG_TRIPLET="x86_64-linux-gnu" -DTCC_TARGET_X86_64 -DONE_SOURCE=0 -Wall -O2 -Wdeclaration-after-statement -fno-strict-aliasing -Wno-pointer-sign -Wno-sign-compare -Wno-unused-result -Wno-format-truncation -Wno-stringop-truncation -I.'
 PREFIX=/boot/usr/local
 
 $CC -o tcc.o -c tcc.c $CFLAGS

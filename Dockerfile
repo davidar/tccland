@@ -165,10 +165,10 @@ RUN make -j$(nproc)
 # RUN cp -f /usr/local/toybox/bin/toybox /usr/local/bin/toybox
 RUN rm generated/obj/main.o
 
-# COPY src/dash /src/dash
-# WORKDIR /src/dash/src
-# RUN make
-# RUN cp -f dash /bin/sh
+COPY src/dash /src/dash
+WORKDIR /src/dash/src
+RUN make
+RUN cp -f dash /bin/sh
 
 # WORKDIR /src/oksh
 # RUN ./configure
