@@ -1,0 +1,11 @@
+*.o
+
+/src/toybox/.config*
+/src/toybox/.single*
+/src/toybox/change/
+/src/toybox/generated/
+/src/toybox/kconfig/mconf
+/src/toybox/kconfig/conf
+/src/toybox/kconfig/*.c
+/src/toybox/toybox
+/src/toybox/toybox_unstripped

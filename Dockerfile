@@ -17,7 +17,6 @@ WORKDIR /src/tcc
 RUN ./configure
 RUN make -j$(nproc)
 RUN make install
-RUN make clean
 
 COPY src/musl /src/musl
 WORKDIR /src/musl
@@ -25,7 +24,6 @@ RUN ./configure --target=x86_64 CC='tcc' AR='tcc -ar' RANLIB='echo' LIBCC='/usr/
 RUN make -j$(nproc) CFLAGS=-g
 RUN make install
 RUN make DESTDIR=/dest install
-RUN make clean
 
 RUN echo "GROUP ( /usr/local/musl/lib/libc.a /usr/local/lib/tcc/libtcc1.a )" > /libc.ld
 
@@ -38,7 +36,6 @@ RUN ./configure \
 RUN make -j$(nproc)
 RUN make install
 RUN make DESTDIR=/dest install
-RUN make clean
 
 COPY src/toybox /src/toybox
 COPY src/toybox.config /src/toybox/.config
@@ -48,20 +45,17 @@ RUN make -j$(nproc) NOSTRIP=1 CC=tcc \
     CFLAGS="-nostdinc -nostdlib -I/usr/local/musl/include -I/usr/include -I/usr/include/x86_64-linux-gnu -g" \
     LDFLAGS="-nostdlib /usr/local/musl/lib/crt1.o /libc.ld -static"
 # RUN PREFIX=/dest/usr/local/bin make install_flat
-# RUN make clean
 RUN rm generated/obj/main.o
 
 COPY src/dash /src/dash
-WORKDIR /src/dash
-RUN ./autogen.sh
-RUN ./configure CC=tcc \
+WORKDIR /src/dash/src
+RUN CC=tcc \
     CFLAGS="-nostdinc -I/usr/local/musl/include" \
     LDFLAGS="-nostdlib -static" \
-    LIBS="/usr/local/musl/lib/crt1.o /libc.ld"
-RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
-RUN make -j$(nproc)
-RUN make DESTDIR=/dest install
-RUN make clean
+    LIBS="/usr/local/musl/lib/crt1.o /libc.ld" \
+    make
+RUN mkdir -p /dest/bin
+RUN cp dash /dest/bin/sh
 
 # COPY bmake /src/bmake
 # RUN CC=tcc \
@@ -90,19 +84,19 @@ RUN make clean
 
 
 FROM scratch AS stage-1
+
+COPY --from=stage-0 /dest/bin/sh /bin/sh
 COPY --from=stage-0 /dest/usr /usr
-COPY --from=stage-0 /src /src
 
-SHELL ["/usr/local/bin/dash", "-c"]
+SHELL ["/bin/sh", "-c"]
+CMD ["/bin/sh"]
 
-RUN mkdir -p /bin /usr/lib /tmp
-RUN ln -sv /usr/local/bin/dash /bin/sh
+RUN mkdir -p /usr/lib
 RUN ln -sv /usr/local/musl/include /usr/include
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
 RUN ln -sv /usr/local/bin/tcc /bin/cc
 
-CMD ["/bin/sh"]
-
+COPY src/tcc /src/tcc
 COPY src/tcc-boot.sh /src/tcc/boot.sh
 WORKDIR /src/tcc
 RUN ./boot.sh
@@ -119,6 +113,8 @@ RUN ./boot.sh
 # RUN bmake YACC="yacc -d -b awkgram"
 # RUN cp a.out /usr/bin/awk
 
+RUN mkdir -p /tmp
+
 RUN for cmd in grep sed awk rm mkdir cp echo true chmod ls; do \
         printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
         chmod +x /usr/local/bin/$cmd; \
@@ -133,6 +129,7 @@ RUN ./build.sh
 RUN ./make MAKEINFO=true
 RUN ./make MAKEINFO=true install
 
+COPY src/musl /src/musl
 WORKDIR /src/musl
 RUN rm -rf /usr/local/musl
 RUN ./configure CC=tcc AR="tcc -ar" RANLIB=echo
@@ -153,12 +150,19 @@ RUN for cmd in sort xargs readlink tr uname cmp dirname basename head wc cat egr
         chmod +x /usr/local/bin/$cmd; \
     done
 
+COPY src/toybox /src/toybox
+COPY src/toybox.config /src/toybox/.config
 WORKDIR /src/toybox
 RUN make clean
 RUN make -j$(nproc)
 # RUN PREFIX=/usr/local/toybox/bin make install_flat
 # RUN cp -f /usr/local/toybox/bin/toybox /usr/local/bin/toybox
 RUN rm generated/obj/main.o
+
+COPY src/dash /src/dash
+WORKDIR /src/dash/src
+RUN make
+RUN cp -f dash /bin/sh
 
 # WORKDIR /src/oksh
 # RUN ./configure
@@ -218,13 +222,6 @@ RUN for cmd in env; do \
 
 RUN mkdir -p /usr/bin
 RUN ln -sv /usr/local/bin/env /usr/bin/env
-
-# WORKDIR /src/dash
-# RUN ./autogen.sh
-# RUN ./configure
-# RUN sed -i '/HAVE_ALIAS_ATTRIBUTE/d' config.h
-# RUN make -j$(nproc)
-# RUN make install
 
 ADD https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz /src/gawk-5.3.0.tar.gz
 WORKDIR /src
