@@ -28,3 +28,6 @@
 [submodule "libretls"]
 	path = ports/bsd/libretls
 	url = https://git.causal.agency/libretls
+[submodule "bsdar"]
+	path = ports/bsd/bsdar
+	url = https://github.com/AntumDeluge/bsdar.git
