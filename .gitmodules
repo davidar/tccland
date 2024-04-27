@@ -20,7 +20,7 @@
 	path = ports/unix/heirloom-ng
 	url = https://github.com/Projeto-Pindorama/heirloom-ng.git
 [submodule "oksh"]
-	path = src/oksh
+	path = ports/bsd/oksh
 	url = https://github.com/davidar/oksh.git
 [submodule "perl5"]
 	path = ports/lang/perl5

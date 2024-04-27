@@ -32,10 +32,11 @@ RUN make clean
 RUN ./configure \
     --extra-cflags="-nostdinc -nostdlib -I/usr/local/musl/include -DCONFIG_TCC_STATIC" \
     --extra-ldflags="-nostdlib /usr/local/musl/lib/crt1.o /libc.ld -static" \
-    --config-ldl=no --config-debug=yes
+    --config-ldl=no --config-debug=yes --config-bcheck=no
 RUN make -j$(nproc)
 RUN make install
 RUN make DESTDIR=/dest install
+RUN rm /dest/usr/local/bin/tcc
 
 COPY src/toybox /src/toybox
 COPY src/toybox.config /src/toybox/.config
@@ -95,17 +96,10 @@ RUN mkdir -p /usr/lib
 RUN ln -sv /usr/local/musl/include /usr/include
 RUN ln -sv /usr/local/musl/lib /usr/lib/x86_64-linux-gnu
 
-# COPY src/test.c /src/test.c
-# WORKDIR /src
-# RUN cc -o test test.c
-# RUN ./test
-
-COPY src/tcc /src/tcc
-COPY src/tcc-boot.sh /src/tcc/boot.sh
-WORKDIR /src/tcc
-RUN ./boot.sh
-
-RUN rm /usr/local/bin/tcc
+# COPY src/tcc /src/tcc
+# COPY src/tcc-boot.sh /src/tcc/boot.sh
+# WORKDIR /src/tcc
+# RUN ./boot.sh
 
 # COPY sbase /src/sbase
 # WORKDIR /src/sbase
@@ -134,6 +128,21 @@ RUN ./configure --disable-dependency-tracking LD=cc AR="cc -ar"
 RUN ./build.sh
 RUN ./make MAKEINFO=true
 RUN ./make MAKEINFO=true install
+
+COPY src/tcc /src/tcc
+WORKDIR /src/tcc
+RUN make clean
+RUN ./configure --cc=cc --config-ldl=no --config-debug=yes --config-bcheck=no
+RUN make -j$(nproc)
+RUN make install
+
+COPY src/test.c /src/test.c
+WORKDIR /src
+RUN /usr/local/bin/tcc -o test test.c
+RUN ./test
+RUN rm ./test
+
+RUN rm /usr/local/bin/tcc
 
 COPY src/musl /src/musl
 WORKDIR /src/musl
@@ -175,6 +184,11 @@ RUN cp -f dash /bin/sh
 # RUN make -j$(nproc)
 # RUN make install
 
+WORKDIR /src
+RUN cc -o test test.c
+RUN ./test
+RUN rm ./test
+
 RUN for cmd in comm expr touch uniq mv; do \
         printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
         chmod +x /usr/local/bin/$cmd; \
@@ -213,14 +227,6 @@ RUN ./configure
 RUN make
 RUN make install
 
-ADD https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz /src/libtool-2.4.7.tar.gz
-WORKDIR /src
-RUN tar -xf libtool-2.4.7.tar.gz
-WORKDIR /src/libtool-2.4.7
-RUN ./configure --disable-shared LD=cc AR="cc -ar"
-RUN make
-RUN make install
-
 RUN for cmd in env; do \
         printf '#!/bin/sh\nexec %s "$@"' "$cmd" > /usr/local/bin/$cmd; \
         chmod +x /usr/local/bin/$cmd; \
@@ -228,6 +234,14 @@ RUN for cmd in env; do \
 
 RUN mkdir -p /usr/bin
 RUN ln -sv /usr/local/bin/env /usr/bin/env
+
+ADD https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.gz /src/libtool-2.4.7.tar.gz
+WORKDIR /src
+RUN tar -xf libtool-2.4.7.tar.gz
+WORKDIR /src/libtool-2.4.7
+RUN ./configure --disable-shared LD=cc AR="cc -ar"
+RUN make
+RUN make install
 
 ADD https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz /src/gawk-5.3.0.tar.gz
 WORKDIR /src
@@ -281,7 +295,7 @@ RUN ./configure CFLAGS=-O2 CFLAGS_FOR_TARGET=-O2 \
 RUN make
 RUN make install
 
-COPY src/test.c /src/test.c
-WORKDIR /src
-RUN gcc -o test test.c -static
-RUN ./test
+# COPY src/test.c /src/test.c
+# WORKDIR /src
+# RUN gcc -o test test.c -static
+# RUN ./test
